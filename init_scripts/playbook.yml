@@ -19,6 +19,19 @@
             prior: "Test"
 
   post_tasks:
+
+
+  - name: "Enable RHEL 7 RPMs repositories with label"
+    redhat.satellite.repository_set:
+      username: "{{ workshop_satellite_user_name }}"
+      password: "{{ workshop_satellite_user_password }}"
+      server_url: "{{ workshop_satellite_url }}"
+      organization: "Default Organization"
+      label: dirsrv-12-for-rhel-9-x86_64-rpms
+      repositories:
+        - releasever: "9"
+      state: enabled
+
   - name: "Enable the Directory Server Repo and set to Immediate"
     redhat.satellite.repository:
       username: "{{ workshop_satellite_user_name }}"
@@ -31,7 +44,6 @@
       organization: "Default Organization"
       url: "https://cdn.redhat.com/content/dist/rhel9/9/x86_64/resilientstorage/os"
       download_policy: immediate
-      mirror_on_sync: true
 
   - name: "Sync the Directory Server Repo"
     redhat.satellite.repository_sync:
