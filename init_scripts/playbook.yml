@@ -1,7 +1,7 @@
 ---
 - name: create lifecycle environments for the Satellite Server
-  ansible.builtin.include_vars:
-    file: values.yml
+  vars_files:
+    - values.yml
   hosts: localhost
   roles:
     - role: redhat.satellite.lifecycle_environments
