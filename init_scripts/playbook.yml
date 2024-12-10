@@ -105,7 +105,7 @@
       username: "{{ workshop_satellite_user_name }}"
       password: "{{ workshop_satellite_user_password }}"
       server_url: "{{ workshop_satellite_url }}"
-      name: "Clients"
+      name: "Clients2"
       organization: "Default Organization"
       lifecycle_environment: "Development"
       content_view: 'RHEL 9'
