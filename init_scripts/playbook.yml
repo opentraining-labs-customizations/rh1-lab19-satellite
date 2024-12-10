@@ -21,7 +21,7 @@
   post_tasks:
 
 
-  - name: "Enable RHEL 7 RPMs repositories with label"
+  - name: "Enable Directory Server RPMs repositories with label"
     redhat.satellite.repository_set:
       username: "{{ workshop_satellite_user_name }}"
       password: "{{ workshop_satellite_user_password }}"
@@ -105,12 +105,9 @@
       username: "{{ workshop_satellite_user_name }}"
       password: "{{ workshop_satellite_user_password }}"
       server_url: "{{ workshop_satellite_url }}"
-      name: "Clients2"
+      name: "client_key"
       organization: "Default Organization"
       lifecycle_environment: "Development"
       content_view: 'RHEL 9'
-      content_overrides:
-        - label: Red_Hat_Satellite_Client_6_for_RHEL_9_x86_64_RPMs
-          override: enabled
       auto_attach: true
       release_version: 9

@@ -2,5 +2,24 @@
 - name: "Setup and Configure Module 1"
   vars_files:
     - values.yml
-  hosts: nodes
-  
+- hosts: localhost
+  tasks: 
+    - name: "Generate registration command"
+      redhat.satellite.registration_command:
+        sername: "{{ workshop_satellite_user_name }}"
+        password: "{{ workshop_satellite_user_password }}"
+        server_url: "{{ workshop_satellite_url }}"
+        validate_certs: false
+        smart_proxy: "capsule.{{ subdomain }}"
+        setup_remote_execution: true
+        organization: "Default Organization"
+        activation_keys: "client_key"
+        insecure: true
+        lifecycle_environment: "Development"        
+      register: command
+      
+- hosts: node1
+  tasks:
+    - name: "Register the host to the capsule"
+      ansible.builtin.shell:
+        cmd: "{{ command.registration_command }}"
