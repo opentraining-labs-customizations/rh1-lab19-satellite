@@ -24,10 +24,10 @@
       username: "{{ workshop_satellite_user_name }}"
       password: "{{ workshop_satellite_user_password }}"
       server_url: "{{ workshop_satellite_url }}"
-      name: "Red Hat Enterprise Linux 9 for x86_64 - Resilient Storage RPMs 9"
+      name: "Red Hat Directory Server 12 for RHEL 9 x86_64 RPMs 9"
       state: present
       content_type: "yum"
-      product: "Red Hat Enterprise Linux Resilient Storage for x86_64"
+      product: "Red Hat Directory Server"
       organization: "Default Organization"
       url: "https://cdn.redhat.com/content/dist/rhel9/9/x86_64/resilientstorage/os"
       download_policy: immediate
@@ -38,8 +38,8 @@
       username: "{{ workshop_satellite_user_name }}"
       password: "{{ workshop_satellite_user_password }}"
       server_url: "{{ workshop_satellite_url }}"
-      repository: "Red Hat Enterprise Linux 9 for x86_64 - Resilient Storage RPMs 9"
-      product: "Red Hat Enterprise Linux Resilient Storage for x86_64"
+      repository: "Red Hat Directory Server 12 for RHEL 9 x86_64 RPMs 9"
+      product: "Red Hat Directory Server"
       organization: "Default Organization"
 
   - name: "Update the Caspule settings"
