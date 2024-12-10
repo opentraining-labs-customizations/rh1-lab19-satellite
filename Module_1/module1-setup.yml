@@ -1,0 +1,6 @@
+---
+- name: "Setup and Configure Module 1"
+  vars_files:
+    - values.yml
+  hosts: nodes
+  
