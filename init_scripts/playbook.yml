@@ -19,7 +19,7 @@
             prior: "Test"
 
   post_tasks:
-  - name: "Set the Resiliant Storage Repo to Immediate"
+  - name: "Enable the Directory Server Repo and set to Immediate"
     redhat.satellite.repository:
       username: "{{ workshop_satellite_user_name }}"
       password: "{{ workshop_satellite_user_password }}"
@@ -33,7 +33,7 @@
       download_policy: immediate
       mirror_on_sync: true
 
-  - name: "Sync the resiliant storage repo"
+  - name: "Sync the Directory Server Repo"
     redhat.satellite.repository_sync:
       username: "{{ workshop_satellite_user_name }}"
       password: "{{ workshop_satellite_user_password }}"
