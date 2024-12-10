@@ -1,0 +1,17 @@
+---
+- name: "Break Registration on Node 2"
+  hosts: node2
+  tasks:
+  
+  - name: "Unregister the node from the Satellite"
+    become: true
+    redhat.rhel_system_roles.redhat_subscription:
+      state: absent
+
+  - name: "Break rhsm.conf"
+    become: true
+    ansible.builtin.lineinfile:
+      path: /etc/rhsm/rhsm.conf
+      search_string: "hostname = "
+      line: "hostname = this-satellite-is-broken.com"
+      
