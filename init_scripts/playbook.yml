@@ -1,0 +1,89 @@
+---
+- name: create lifecycle environments for the Satellite Server
+  ansible.builtin.include_vars:
+    file: values.yml
+  hosts: localhost
+  roles:
+    - role: redhat.satellite.lifecycle_environments
+      vars:
+        satellite_server_url: {{ workshop_satellite_url }}
+        satellite_username: {{ workshop_satellite_user_name }}
+        satellite_password: {{ workshop_satellite_user_password }}
+        satellite_organization: "Default Organization"
+        satellite_lifecycle_environments:
+          - name: "Development"
+            prior: "Library"
+          - name: "Test"
+            prior: "Development"
+          - name: "Production"
+            prior: "Test"
+
+  post_tasks:
+  - name: "Set the Resiliant Storage Repo to Immediate"
+    redhat.satellite.repository:
+      username: {{ workshop_satellite_user_name }}
+      password: {{ workshop_satellite_user_password }}
+      server_url: {{ workshop_satellite_url }}
+      name: "Red Hat Enterprise Linux 9 for x86_64 - Resilient Storage RPMs 9"
+      state: present
+      content_type: "yum"
+      product: "Red Hat Enterprise Linux Resilient Storage for x86_64"
+      organization: "Default Organization"
+      url: "https://cdn.redhat.com/content/dist/rhel9/9/x86_64/resilientstorage/os"
+      download_policy: immediate
+      mirror_on_sync: true
+
+  - name: "Sync the resiliant storage repo"
+    redhat.satellite.repository_sync:
+      username: {{ workshop_satellite_user_name }}
+      password: {{ workshop_satellite_user_password }}
+      server_url: {{ workshop_satellite_url }}
+      repository: "Red Hat Enterprise Linux 9 for x86_64 - Resilient Storage RPMs 9"
+      product: "Red Hat Enterprise Linux Resilient Storage for x86_64"
+      organization: "Default Organization"
+
+  - name: "Update the Caspule settings"
+    redhat.satellite.smart_proxy:
+      username: {{ workshop_satellite_user_name }}
+      password: {{ workshop_satellite_user_password }}
+      server_url: {{ workshop_satellite_url }}
+      name: "capsule.{{ subdomain }}"
+      url: "https://capsule.{{ subdomain }}:9090"
+      download_policy: "immediate"
+      lifecycle_environments:
+        - "Development"
+        - "Test"
+        - "Production"
+      organizations:
+        - "Default Organization"
+      locations:
+        - "Default Location"
+      state: present
+
+  - name: "Create or update Red Hat content view"
+    redhat.satellite.content_view:
+      username: {{ workshop_satellite_user_name }}
+      password: {{ workshop_satellite_user_password }}
+      server_url: {{ workshop_satellite_url }}
+      name: "RHEL 9"
+      organization: "Default Organization"
+      repositories:
+        - name: 'Red Hat Enterprise Linux 9 for x86_64 - AppStream RPMs 9'
+          product: 'Red Hat Enterprise Linux for x86_64'
+        - name: 'Red Hat Enterprise Linux 9 for x86_64 - BaseOS RPMs 9'
+          product: 'Red Hat Enterprise Linux for x86_64'
+        - name: 'Red Hat Satellite Client 6 for RHEL 9 x86_64 RPMs'
+          product: 'Red Hat Enterprise Linux for x86_64'
+    
+  - name: "Publish Red Hat Content View"
+    redhat.satellite.content_view_version:
+      username: {{ workshop_satellite_user_name }}
+      password: {{ workshop_satellite_user_password }}
+      server_url: {{ workshop_satellite_url }}
+      content_view: "RHEL 9"
+      organization: "Default Organization"
+      version: "1.0"
+      lifecycle_environments:
+        - Development
+        - Test
+        - Production
