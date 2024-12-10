@@ -1,2 +1,10 @@
-[satellite]
-satellite.example.com
+[satellites]
+satellite
+
+[capsules]
+capsule
+
+[nodes]
+node1
+node2
+node3

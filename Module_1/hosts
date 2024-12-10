@@ -1,12 +1,10 @@
-[satellite]
+[satellites]
 satellite
 
-[capsule]
+[capsules]
 capsule
-
 
 [nodes]
 node1
 node2
 node3
-
