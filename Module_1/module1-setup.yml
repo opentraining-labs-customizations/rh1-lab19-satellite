@@ -5,6 +5,7 @@
 - hosts: localhost
   tasks: 
   - name: "Generate registration command"
+  # note that this module isn't in the Execution Environment and needs to be added.
     redhat.satellite.registration_command:
       username: "{{ workshop_satellite_user_name }}"
       password: "{{ workshop_satellite_user_password }}"
