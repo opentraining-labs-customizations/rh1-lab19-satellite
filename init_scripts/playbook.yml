@@ -99,3 +99,19 @@
         - Development
         - Test
         - Production
+
+  - name: "Create client activation key"
+    redhat.satellite.activation_key:
+      username: "{{ workshop_satellite_user_name }}"
+      password: "{{ workshop_satellite_user_password }}"
+      server_url: "{{ workshop_satellite_url }}"
+      name: "Clients"
+      organization: "Default Organization"
+      lifecycle_environment: "Development"
+      content_view: 'RHEL 9'
+      content_overrides:
+        - label: Red_Hat_Satellite_Client_6_for_RHEL_9_x86_64_RPMs
+          override: enabled
+      auto_attach: true
+      release_version: 9
+      service_level: Standard
