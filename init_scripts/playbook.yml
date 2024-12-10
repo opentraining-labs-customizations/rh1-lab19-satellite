@@ -61,7 +61,7 @@
       server_url: "{{ workshop_satellite_url }}"
       name: "capsule.{{ subdomain }}"
       url: "https://capsule.{{ subdomain }}:9090"
-      download_policy: "immediate"
+      download_policy: "on_demand"
       lifecycle_environments:
         - "Development"
         - "Test"
