@@ -1,7 +1,29 @@
 ---
-- name: "Setup and Configure Module 1"
-  vars_files:
-    - values.yml
+- name: "Fix Registration on Node 2"
+  hosts: node2
+  tasks:
+  
+  - name: "Fix rhsm.conf"
+    become: true
+    ansible.builtin.lineinfile:
+      path: /etc/rhsm/rhsm.conf
+      line: "proxy_hostname = "
+      search_string: "proxy_hostname = thisproxygoesnowhere.local"
+
+
+  - name: "Break rhsm.conf part 2"
+    become: true
+    ansible.builtin.lineinfile:
+      path: /etc/rhsm/rhsm.conf
+      line: "manage_repos = 1"
+      search_string: "manage_repos = 0"
+
+
+  - name: "Unregister the node from the Satellite"
+    redhat.rhel_system_roles.redhat_subscription:
+      state: absent
+    become: true
+
 - hosts: localhost
   tasks: 
   - name: "Generate registration command"

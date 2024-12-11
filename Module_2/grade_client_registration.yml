@@ -1,0 +1,21 @@
+---
+- name: "Verify host Registration"
+  hosts: node2
+  tasks:
+  - name: "Verifying that the host is registered properly to the Satellite"
+    ansible.builtin.command: 
+      cmd: "subscription-manager list | grep "Default_Organization" "
+    become: true
+    register: submanlist
+  
+
+  - name: Check Registration
+    ansible.builtin.debug:
+      msg: "Node is not Registered to the Satellite"
+      when: submanlist.stdout == ""
+
+  - name: Check Registration
+    ansible.builtin.debug:
+      msg: "Node is Registered to the Satellite"
+      when: submanlist.stdout.find('Default_Organization') != -1
+

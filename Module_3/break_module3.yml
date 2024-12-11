@@ -1,0 +1,30 @@
+---
+- name: "Setup Module 3"
+  hosts: localhost
+  tasks:
+  - name: "Publish Red Hat Content View additional content views"
+    redhat.satellite.content_view_version:
+    username: "{{ workshop_satellite_user_name }}"
+    password: "{{ workshop_satellite_user_password }}"
+    server_url: "{{ workshop_satellite_url }}"
+    content_view: "RHEL 9"
+    organization: "Default Organization"
+    version: "{{ item }}.0"
+    lifecycle_environments:
+      - Development
+      - Test
+      - Production
+    loop: "{{ range(1,15) | list }}"
+
+  - name: "Remove the Directory Server Repo to create Orphans"
+    redhat.satellite.repository:
+      username: "{{ workshop_satellite_user_name }}"
+      password: "{{ workshop_satellite_user_password }}"
+      server_url: "{{ workshop_satellite_url }}"
+      name: "Red Hat Directory Server 12 for RHEL 9 x86_64 RPMs 9"
+      state: absent
+      content_type: "yum"
+      product: "Red Hat Directory Server"
+      organization: "Default Organization"
+      url: "https://cdn.redhat.com/content/dist/rhel9/9/x86_64/resilientstorage/os"
+      download_policy: immediate

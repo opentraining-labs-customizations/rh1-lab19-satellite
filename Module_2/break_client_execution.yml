@@ -1,0 +1,26 @@
+---
+- name: Break Client Execution For Module 2
+  hosts: localhost
+  tasks:
+  - name: Create Subnet for Lab
+    redhat.satellite.subnet:
+      name: "Lab Subnet"
+      description: "Subnet for Satellite Lab"
+      network: "192.168.0.0"
+      mask: "255.255.255.254"
+      gateway: "192.168.0.1"
+      boot_mode: "dhcp"
+      remote_execution_proxies:
+        - "satellite.{{ subdomain }}"
+      mtu: 9001
+      domains:
+        - "{{ subdomain_internal }}"
+      organizations:
+        - "Default Organization"
+      locations:
+        - "Default Location"
+      username: "{{ workshop_satellite_user_name }}"
+      password: "{{ workshop_satellite_user_password }}"
+      server_url: "{{ workshop_satellite_url }}"
+      state: present
+

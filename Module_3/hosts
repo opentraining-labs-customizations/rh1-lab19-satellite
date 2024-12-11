@@ -1,0 +1,10 @@
+[satellites]
+satellite
+
+[capsules]
+capsule
+
+[nodes]
+node1
+node2
+node3

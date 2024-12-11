@@ -148,3 +148,12 @@
       server_url: "{{ workshop_satellite_url }}"
       state: present
 
+  - name: "Reset the Remote Execution Fall Back to false"
+    redhat.satellite.setting:
+      username: "{{ workshop_satellite_user_name }}"
+      password: "{{ workshop_satellite_user_password }}"
+      server_url: "{{ workshop_satellite_url }}"
+      name: "remote_execution_fallback_proxy"
+      value: "false"
+
+  

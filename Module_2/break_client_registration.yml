@@ -3,15 +3,23 @@
   hosts: node2
   tasks:
   
-  - name: "Unregister the node from the Satellite"
-    become: true
+  - name: "Unregister the node from the Satellite"    
     redhat.rhel_system_roles.redhat_subscription:
       state: absent
+    become: true
 
   - name: "Break rhsm.conf"
     become: true
     ansible.builtin.lineinfile:
       path: /etc/rhsm/rhsm.conf
-      search_string: "hostname = "
-      line: "hostname = this-satellite-is-broken.com"
+      search_string: "proxy_hostname = "
+      line: "proxy_hostname = thisproxygoesnowhere.local"
+
+
+  - name: "Break rhsm.conf part 2"
+    become: true
+    ansible.builtin.lineinfile:
+      path: /etc/rhsm/rhsm.conf
+      search_string: "manage_repos = 1"
+      line: "manage_repos = 0"
       
