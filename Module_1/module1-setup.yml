@@ -19,7 +19,7 @@
       lifecycle_environment: "Development"        
     register: command
       
-- hosts: node2
+- hosts: nodes
   tasks:
   - name: "Register the hosts to the capsule"
     ansible.builtin.shell:
