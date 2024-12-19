@@ -1,20 +1,26 @@
-# This needs to be Reviewed. Not sure about what exactly needs to be broken here.
+# Break the Capsule by removing certificates and restarting foreman-proxy service.
 
 ---
-- name: Break the connectivity to the Capsule Server
+- name: Break connectivity to the Capsule Server
   hosts: capsule
   tasks:
-  - name: "backup the certificate relationship with the capsule"
+  - name: "Take backup of Capsule certificates"
     ansible.builtin.copy:
       remote_src: true
-      src: "/etc/foreman/client_cert.pem"
+      src: "/etc/foreman-proxy"
       dest: "/tmp/"
     become: true
-   
-  - name: "backup the certificate relationship with the capsule"
-    ansible.builtin.copy:
-    remote_src: true
-    src: "/etc/foreman/client_cert.pem"
-    dest: "/etc/foreman/client_cert.pem"
-  become: true
-      
+
+  - name: "Remove Capsule certificates"
+    ansible.builtin.file:
+      path: "{{ item }}"
+      state: absent
+    with_items:
+      - /etc/foreman-proxy/foreman_ssl_cert.pem
+      - /etc/foreman-proxy/foreman_ssl_ca.pem
+      - /etc/foreman-proxy/foreman_ssl_key.pem
+
+  - name: Restart foreman-proxy service
+    ansible.builtin.service:
+      name: foreman-proxy
+      state: restarted
