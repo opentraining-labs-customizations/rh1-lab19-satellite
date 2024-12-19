@@ -5,6 +5,8 @@ satellite
 capsule
 
 [nodes]
-node1
-node2
-node3
+node1.zrlfh.internal
+node2.zrlfh.internal
+node3.zrlfh.internal
+
+node1.zrlfh.internal
