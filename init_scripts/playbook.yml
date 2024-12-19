@@ -233,6 +233,10 @@
   - name: Install katello-ca-consumer RPM
     shell: 'dnf install http://capsule.{{ subdomain_internal }}/pub/katello-ca-consumer-latest.noarch.rpm -y'
 
+#Purge old Katello fact from Old Satellite
+  - name: Purge RHSM Katello facts
+    shell: sudo rm /etc/rhsm/facts/katello* -f
+
 #Register Node Clients to the Capsule server to use RHEL9-CV
   - name: Register Nodes to Capsule
     shell: 'subscription-manager register --username {{workshop_satellite_user_name}} --password {{workshop_satellite_user_password}} --org "Default_Organization" --environments Development/RHEL9-CV --force'
