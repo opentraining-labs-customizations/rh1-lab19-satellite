@@ -33,4 +33,27 @@ targethost
 workshop_satellite_url  
 workshop_satellite_user_name  
 workshop_satellite_user_password  
+Required Variables:
 
+bastion_public_hostname  
+bastion_ssh_password  
+bastion_ssh_user_name  
+cloud_provider  
+guid  
+showroom_host  
+showroom_primary_view_url  
+ssh_command  
+ssh_password  
+ssh_username  
+subdomain  
+subdomain_internal  
+targethost  
+workshop_satellite_url  
+workshop_satellite_user_name  
+workshop_satellite_user_password  
+username:
+password: 
+server_url: 
+workshop_node1: 
+workshop_node2: 
+workshop_node3: 
