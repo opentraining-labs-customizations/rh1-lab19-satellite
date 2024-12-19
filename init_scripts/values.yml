@@ -1,0 +1,22 @@
+bastion_public_hostname: bastion.zrlfh.sandbox757.opentlc.com
+bastion_ssh_password: PASSWORD
+bastion_ssh_user_name: lab-user
+cloud_provider: ec2
+guid: zrlfh
+showroom_host: bastion.zrlfh.sandbox757.opentlc.com
+showroom_primary_view_url: https://bastion.zrlfh.sandbox757.opentlc.com:443/showroom/
+ssh_command: ssh lab-user@bastion.zrlfh.sandbox757.opentlc.com
+ssh_password: PASSWORD
+ssh_username: lab-user
+subdomain: zrlfh.sandbox757.opentlc.com
+subdomain_internal: zrlfh.internal
+targethost: bastion.zrlfh.sandbox757.opentlc.com
+workshop_satellite_url: "https://satellite.zrlfh.sandbox757.opentlc.com"
+workshop_satellite_user_name: "admin"
+workshop_satellite_user_password: "PASSWORD"
+username: "admin"
+password: "PASSWORD"
+server_url: "https://satellite.zrlfh.sandbox757.opentlc.com"
+workshop_node1: 'node1.zrlfh.internal'
+workshop_node2: 'node2.zrlfh.internal'
+workshop_node3: 'node3.zrlfh.internal'
