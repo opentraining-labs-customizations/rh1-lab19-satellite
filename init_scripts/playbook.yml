@@ -97,8 +97,7 @@
       username: "{{ workshop_satellite_user_name }}"
       password: "{{ workshop_satellite_user_password }}"
       resource: foreman_tasks
-      search: "label = Actions::Katello::Repository::Sync or label = Actions::Katello::CapsuleContent::Sync or label = Actions::Katello::ContentView::CapsuleSync or label 
-= Actions::Katello::ContentView::Publish"
+      search: "label = Actions::Katello::Repository::Sync or label = Actions::Katello::CapsuleContent::Sync or label = Actions::Katello::ContentView::CapsuleSync or label = Actions::Katello::ContentView::Publish"
     register: tasks
 
   - name: Wait for all found tasks to finish
