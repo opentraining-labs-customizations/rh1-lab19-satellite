@@ -65,15 +65,19 @@
 #Sync Repos
 #Using hammer commands as repository_sync module didn't provide an async option
   - name: Sync the Directory Server Repo
+    become: true
     shell: hammer repository synchronize --name "Red Hat Directory Server 12 for RHEL 9 x86_64 RPMs 9" --product "Red Hat Directory Server" --organization "Default Organization" --async
-
+  
   - name: Sync the RHEL 9 BaseOS Repo
+    become: true
     shell: hammer repository synchronize --name "Red Hat Enterprise Linux 9 for x86_64 - BaseOS RPMs 9" --product "Red Hat Enterprise Linux for x86_64" --organization "Default Organization" --async
 
   - name: Sync the RHEL 9 AppStream Repo
+    become: true
     shell: hammer repository synchronize --name "Red Hat Enterprise Linux 9 for x86_64 - AppStream RPMs 9" --product "Red Hat Enterprise Linux for x86_64" --organization "Default Organization" --async
 
   - name: Sync the RHEL 9 Satellite-Client Repo
+    become: true
     shell: hammer repository synchronize --name "Red Hat Satellite Client 6 for RHEL 9 x86_64 RPMs" --product "Red Hat Enterprise Linux for x86_64" --organization "Default Organization" --async
 
 #Check for running sync tasks and pause until sync is complete
@@ -113,6 +117,7 @@
 
 #Ensure Capsule will autosync after CV publish/promote    
   - name: Set Capsule to sync on LCE change
+    become: true
     shell: 'hammer setting set --name foreman_proxy_content_auto_sync --value True'
 
 #Assign LCE,Location,Org to the Capsule
