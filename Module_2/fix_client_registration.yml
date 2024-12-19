@@ -1,6 +1,10 @@
 ---
 - name: "Fix Registration on Node 2"
-  hosts: node2
+  vars_files:
+    - values.yml
+  hosts: "{{ workshop_node2 }}"
+
+
   tasks:
   
   - name: "Fix rhsm.conf"
@@ -24,25 +28,27 @@
       state: absent
     become: true
 
-- hosts: localhost
-  tasks: 
-  - name: "Generate registration command"
-  # note that this module isn't in the Execution Environment and needs to be added.
-    redhat.satellite.registration_command:
-      username: "{{ workshop_satellite_user_name }}"
-      password: "{{ workshop_satellite_user_password }}"
-      server_url: "{{ workshop_satellite_url }}"
-      validate_certs: false
-      smart_proxy: "capsule.{{ subdomain }}"
-      setup_remote_execution: true
-      organization: "Default Organization"
-      activation_keys: "client_key"
-      insecure: true
-      lifecycle_environment: "Development"        
-    register: command
-      
-- hosts: node2
+#Register Nodes to the Capsule server
+- name: Register all Nodes to Capsule
+  become: True
+  vars_files:
+    - values.yml
+  hosts: nodes
   tasks:
-  - name: "Register the hosts to the capsule"
-    ansible.builtin.shell:
-      cmd: "{{ command.registration_command }}"
+  - name: Remove all katello-ca-consumer RPMs
+    shell: 'dnf remove katello-ca-consumer-* -y'
+
+  - name: Remove old registration
+    shell: 'subscription-manager clean'
+
+#Install katello-ca-consumer RPM on Node Clients
+  - name: Install katello-ca-consumer RPM
+    shell: 'dnf install http://capsule.{{ subdomain_internal }}/pub/katello-ca-consumer-latest.noarch.rpm -y'
+
+#Register Node Clients to the Capsule server to use RHEL9-CV
+  - name: Register Nodes to Capsule
+    shell: 'subscription-manager register --username {{workshop_satellite_user_name}} --password {{workshop_satellite_user_password}} --org "Default_Organization" --environments Development/RHEL9-CV --force'
+
+#Enable the BaseOS, Appstream, and Satellite-Client repos on Node1
+  - name: Enable BaseOS, Appstream, Satellite-Client repos on Nodes
+    shell: 'subscription-manager repos --enable rhel-9-for-x86_64-appstream-rpms --enable rhel-9-for-x86_64-baseos-rpms --enable satellite-client-6-for-rhel-9-x86_64-rpms'
