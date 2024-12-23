@@ -3,18 +3,33 @@
   vars_files:
     - values.yml
   hosts: localhost
-  tasks:
-          #  - name: Create lifecycle environments
-          #   shell: hammer lifecycle-environment create --name Development --organization "Default Organization" --prior Library
+  become: True
+  roles:
+  - role: redhat.satellite.lifecycle_environments
+    vars:
+      satellite_server_url: "{{ workshop_satellite_url }}"
+      satellite_username: "{{ workshop_satellite_user_name }}"
+      satellite_password: "{{ workshop_satellite_user_password }}"
+      satellite_organization: "Default Organization"
+      satellite_lifecycle_environments:
+        - name: "Development"
+          prior: "Library"
+        - name: "Test"
+          prior: "Development"
+        - name: "Production"
+          prior: "Test"
 
-          # - name: Create lifecycle environments
-          #   shell: hammer lifecycle-environment create --name Test --organization "Default Organization" --prior Library
-
-          # - name: Create lifecycle environments
-          #   shell: hammer lifecycle-environment create --name Production --organization "Default Organization" --prior Library
+  post_tasks:
   
-          #  - name: "Enable Red Hat Satellite Client 6 for RHEL 9 x86_64 RPMs repository with label"
-          #    shell: 'hammer repository-set enable --name "Red Hat Satellite Client 6 for RHEL 9 x86_64 (RPMs)" --organization "Default Organization"'
+  - name: "Enable Satellite-Client 6 for RHEL 9 repository with label"
+    redhat.satellite.repository_set:
+      username: "{{ workshop_satellite_user_name }}"
+      password: "{{ workshop_satellite_user_password }}"
+      server_url: "{{ workshop_satellite_url }}"
+      organization: "Default Organization"
+      label: satellite-client-6-for-rhel-9-x86_64-rpms
+      all_repositories: true
+      state: enabled
 
   - name: "Enable RHEL 9 BaseOS RPMs repository with label"
     redhat.satellite.repository_set:
@@ -66,7 +81,7 @@
 #Using hammer commands as repository_sync module didn't provide an async option
   - name: Sync the Directory Server Repo
     shell: hammer repository synchronize --name "Red Hat Directory Server 12 for RHEL 9 x86_64 RPMs 9" --product "Red Hat Directory Server" --organization "Default Organization" --async
-
+  
   - name: Sync the RHEL 9 BaseOS Repo
     shell: hammer repository synchronize --name "Red Hat Enterprise Linux 9 for x86_64 - BaseOS RPMs 9" --product "Red Hat Enterprise Linux for x86_64" --organization "Default Organization" --async
 
@@ -76,40 +91,24 @@
   - name: Sync the RHEL 9 Satellite-Client Repo
     shell: hammer repository synchronize --name "Red Hat Satellite Client 6 for RHEL 9 x86_64 RPMs" --product "Red Hat Enterprise Linux for x86_64" --organization "Default Organization" --async
 
-#Check for running sync tasks and pause until sync is complete
-#  - name: Search for running repo/Capsule sync tasks and CV Publish tasks
-#    resource_info:
-#      server_url: "{{ workshop_satellite_url }}"
-#      username: "{{ workshop_satellite_user_name }}"
-#      password: "{{ workshop_satellite_user_password }}"
-#      resource: foreman_tasks
-#      search: "(label = Actions::Katello::Repository::Sync or label = Actions::Katello::CapsuleContent::Sync or label = Actions::Katello::ContentView::CapsuleSync or label= Actions::Katello::ContentView::Publish) and state = running"
-#    register: tasks
+# Check for running sync tasks and pause until sync is complete
+  - name: Search for running repo/Capsule sync tasks and CV Publish tasks
+    redhat.satellite.resource_info:
+      server_url: "{{ workshop_satellite_url }}"
+      username: "{{ workshop_satellite_user_name }}"
+      password: "{{ workshop_satellite_user_password }}"
+      resource: foreman_tasks
+      search: "(label = Actions::Katello::Repository::Sync or label = Actions::Katello::CapsuleContent::Sync or label = Actions::Katello::ContentView::CapsuleSync or label= Actions::Katello::ContentView::Publish) and state = running"
+    register: tasks
 
-    #  - name: Wait for all found tasks to finish
-    #    wait_for_task:
-    #      server_url: "{{ workshop_satellite_url }}"
-    #      username: "{{ workshop_satellite_user_name }}"
-    #      password: "{{ workshop_satellite_user_password }}"
-    #      task: "{{ item }}"
-    #      timeout: 900
-    #    loop: "{{ tasks.resources | map(attribute='id') | list }}"
-
-    #  - name: Wait for repository sync tasks to complete
-    #    redhat.satellite.wait_for_task:
-    #      server_url: "{{ workshop_satellite_url }}"
-    #      username: "{{ workshop_satellite_user_name }}"
-    #      password: "{{ workshop_satellite_user_password }}"
-    #      search: >
-    #        label = Actions::Katello::Repository::Sync or
-    #        label = Actions::Katello::CapsuleContent::Sync or
-    #        label = Actions::Katello::ContentView::CapsuleSync or
-    #        label = Actions::Katello::ContentView::Publish
-    #      timeout: 900
-
-  - name: Pausing for sync to finish
-    ansible.builtin.pause:
-      minutes: 1
+  - name: Wait for all found tasks to finish
+    redhat.satellite.wait_for_task:
+      server_url: "{{ workshop_satellite_url }}"
+      username: "{{ workshop_satellite_user_name }}"
+      password: "{{ workshop_satellite_user_password }}"
+      task: "{{ item }}"
+      timeout: 900
+    loop: "{{ tasks.resources | map(attribute='id') | list }}"
 
 #Ensure Capsule will autosync after CV publish/promote    
   - name: Set Capsule to sync on LCE change
@@ -217,12 +216,12 @@
       state: present
 
 
-#Register Node1 to the Capsule server
-- name: Register Node1 to Capsule
+#Register Nodes to the Capsule server
+- name: Register all Nodes to Capsule
+  become: True
   vars_files:
     - values.yml
-  hosts: "{{ workshop_node1 }}"
-  become: True
+  hosts: nodes
   tasks:
   - name: Remove all katello-ca-consumer RPMs
     shell: 'dnf remove katello-ca-consumer-* -y'
@@ -230,14 +229,18 @@
   - name: Remove old registration
     shell: 'subscription-manager clean'
 
-#Install katello-ca-consumer RPM on Node1 Client
+#Install katello-ca-consumer RPM on Node Clients
   - name: Install katello-ca-consumer RPM
     shell: 'dnf install http://capsule.{{ subdomain_internal }}/pub/katello-ca-consumer-latest.noarch.rpm -y'
 
-#Register Node1 Client to the Capsule server to use RHEL9-CV
-  - name: Register Node1 to Capsule
+#Purge old Katello fact from Old Satellite
+  - name: Purge RHSM Katello facts
+    shell: sudo rm /etc/rhsm/facts/katello* -f
+
+#Register Node Clients to the Capsule server to use RHEL9-CV
+  - name: Register Nodes to Capsule
     shell: 'subscription-manager register --username {{workshop_satellite_user_name}} --password {{workshop_satellite_user_password}} --org "Default_Organization" --environments Development/RHEL9-CV --force'
 
 #Enable the BaseOS, Appstream, and Satellite-Client repos on Node1
-  - name: Enable BaseOS, Appstream, Satellite-Client repos on Node1
+  - name: Enable BaseOS, Appstream, Satellite-Client repos on Nodes
     shell: 'subscription-manager repos --enable rhel-9-for-x86_64-appstream-rpms --enable rhel-9-for-x86_64-baseos-rpms --enable satellite-client-6-for-rhel-9-x86_64-rpms'
