@@ -221,7 +221,7 @@
   become: True
   vars_files:
     - values.yml
-  hosts: "{{ workshop_node1}}"
+  hosts: "{{ workshop_node1 }}"
   tasks:
   - name: Remove all katello-ca-consumer RPMs
     shell: 'dnf remove katello-ca-consumer-* -y'
@@ -251,7 +251,7 @@
   become: True
   vars_files:
     - values.yml
-  hosts: "{{ workshop_node2}}"
+  hosts: "{{ workshop_node2 }}"
   tasks:
   - name: Remove all katello-ca-consumer RPMs
     shell: 'dnf remove katello-ca-consumer-* -y'
@@ -281,7 +281,7 @@
   become: True
   vars_files:
     - values.yml
-  hosts: "{{ workshop_node3}}"
+  hosts: "{{ workshop_node3 }}"
   tasks:
   - name: Remove all katello-ca-consumer RPMs
     shell: 'dnf remove katello-ca-consumer-* -y'
