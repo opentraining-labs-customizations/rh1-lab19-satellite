@@ -216,12 +216,12 @@
       state: present
 
 
-#Register Nodes to the Capsule server
-- name: Register all Nodes to Capsule
+#Register Node1 to the Capsule server
+- name: Register Node1 to Capsule
   become: True
   vars_files:
     - values.yml
-  hosts: nodes
+  hosts: "{{ workshop_node1 }}"
   tasks:
   - name: Remove all katello-ca-consumer RPMs
     shell: 'dnf remove katello-ca-consumer-* -y'
@@ -229,7 +229,7 @@
   - name: Remove old registration
     shell: 'subscription-manager clean'
 
-#Install katello-ca-consumer RPM on Node Clients
+#Install katello-ca-consumer RPM
   - name: Install katello-ca-consumer RPM
     shell: 'dnf install http://capsule.{{ subdomain_internal }}/pub/katello-ca-consumer-latest.noarch.rpm -y'
 
@@ -237,10 +237,70 @@
   - name: Purge RHSM Katello facts
     shell: sudo rm /etc/rhsm/facts/katello* -f
 
-#Register Node Clients to the Capsule server to use RHEL9-CV
+#Register Node to the Capsule server to use RHEL9-CV content view
   - name: Register Nodes to Capsule
     shell: 'subscription-manager register --username {{workshop_satellite_user_name}} --password {{workshop_satellite_user_password}} --org "Default_Organization" --environments Development/RHEL9-CV --force'
 
-#Enable the BaseOS, Appstream, and Satellite-Client repos on Node1
+#Enable the BaseOS, Appstream, and Satellite-Client repos
+  - name: Enable BaseOS, Appstream, Satellite-Client repos on Nodes
+    shell: 'subscription-manager repos --enable rhel-9-for-x86_64-appstream-rpms --enable rhel-9-for-x86_64-baseos-rpms --enable satellite-client-6-for-rhel-9-x86_64-rpms'
+
+
+#Register Node2 to the Capsule server
+- name: Register Node1 to Capsule
+  become: True
+  vars_files:
+    - values.yml
+  hosts: "{{ workshop_node2 }}"
+  tasks:
+  - name: Remove all katello-ca-consumer RPMs
+    shell: 'dnf remove katello-ca-consumer-* -y'
+
+  - name: Remove old registration
+    shell: 'subscription-manager clean'
+
+#Install katello-ca-consumer RPM
+  - name: Install katello-ca-consumer RPM
+    shell: 'dnf install http://capsule.{{ subdomain_internal }}/pub/katello-ca-consumer-latest.noarch.rpm -y'
+
+#Purge old Katello fact from Old Satellite
+  - name: Purge RHSM Katello facts
+    shell: sudo rm /etc/rhsm/facts/katello* -f
+
+#Register Node to the Capsule server to use RHEL9-CV content view
+  - name: Register Nodes to Capsule
+    shell: 'subscription-manager register --username {{workshop_satellite_user_name}} --password {{workshop_satellite_user_password}} --org "Default_Organization" --environments Development/RHEL9-CV --force'
+
+#Enable the BaseOS, Appstream, and Satellite-Client repos
+  - name: Enable BaseOS, Appstream, Satellite-Client repos on Nodes
+    shell: 'subscription-manager repos --enable rhel-9-for-x86_64-appstream-rpms --enable rhel-9-for-x86_64-baseos-rpms --enable satellite-client-6-for-rhel-9-x86_64-rpms'
+
+
+#Register Node1 to the Capsule server
+- name: Register Node3 to Capsule
+  become: True
+  vars_files:
+    - values.yml
+  hosts: "{{ workshop_node3 }}"
+  tasks:
+  - name: Remove all katello-ca-consumer RPMs
+    shell: 'dnf remove katello-ca-consumer-* -y'
+
+  - name: Remove old registration
+    shell: 'subscription-manager clean'
+
+#Install katello-ca-consumer RPM
+  - name: Install katello-ca-consumer RPM
+    shell: 'dnf install http://capsule.{{ subdomain_internal }}/pub/katello-ca-consumer-latest.noarch.rpm -y'
+
+#Purge old Katello fact from Old Satellite
+  - name: Purge RHSM Katello facts
+    shell: sudo rm /etc/rhsm/facts/katello* -f
+
+#Register Node to the Capsule server to use RHEL9-CV content view
+  - name: Register Nodes to Capsule
+    shell: 'subscription-manager register --username {{workshop_satellite_user_name}} --password {{workshop_satellite_user_password}} --org "Default_Organization" --environments Development/RHEL9-CV --force'
+
+#Enable the BaseOS, Appstream, and Satellite-Client repos
   - name: Enable BaseOS, Appstream, Satellite-Client repos on Nodes
     shell: 'subscription-manager repos --enable rhel-9-for-x86_64-appstream-rpms --enable rhel-9-for-x86_64-baseos-rpms --enable satellite-client-6-for-rhel-9-x86_64-rpms'
