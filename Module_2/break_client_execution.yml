@@ -1,6 +1,8 @@
 ---
 - name: Break Client Execution For Module 2
   hosts: localhost
+  vars_files:
+    - /tmp/vars.yml
   tasks:
   - name: Create Subnet for Lab
     redhat.satellite.subnet:
@@ -9,18 +11,18 @@
       network: "192.168.0.0"
       mask: "255.255.255.254"
       gateway: "192.168.0.1"
-      boot_mode: "dhcp"
+      boot_mode: "DHCP"
       remote_execution_proxies:
-        - "satellite.{{ subdomain }}"
+        - "satellite.{{ var_subdomain }}"
       mtu: 9001
       domains:
-        - "{{ subdomain_internal }}"
+        - "{{ var_subdomain_internal }}"
       organizations:
         - "Default Organization"
       locations:
         - "Default Location"
-      username: "{{ workshop_satellite_user_name }}"
-      password: "{{ workshop_satellite_user_password }}"
-      server_url: "{{ workshop_satellite_url }}"
+      username: "{{ var_workshop_satellite_user_name }}"
+      password: "{{ var_workshop_satellite_user_password }}"
+      server_url: "https://{{ var_workshop_satellite_url }}"
       state: present
 
