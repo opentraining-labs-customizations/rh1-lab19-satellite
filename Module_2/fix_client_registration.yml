@@ -3,30 +3,24 @@
   vars_files:                                                                                          
     - /tmp/vars.yml                                                                                    
   hosts: "node2.{{ var_subdomain_internal }}"                                                          
-                                                                                                       
-                                                                                                       
-  tasks:                                                                                               
-                                                                                                       
-  - name: "Fix rhsm.conf"                                                                              
-    become: true                                                                                       
-    ansible.builtin.lineinfile:                                                                        
-      path: /etc/rhsm/rhsm.conf                                                                        
-      line: "proxy_hostname = "                                                                        
-      search_string: "proxy_hostname = thisproxygoesnowhere.local"                                     
-                                                                                                       
-                                                                                                       
-  - name: "Break rhsm.conf part 2"                                                                     
-    become: true                                                                                       
-    ansible.builtin.lineinfile:                                                                        
-      path: /etc/rhsm/rhsm.conf                                                                        
-      line: "manage_repos = 1"                                                                         
-      search_string: "manage_repos = 0"                                                                
-                                                                                                       
+  tasks:
+  - name: Getting Information for breaking
+    ansible.builtin.shell: "grep home /etc/passwd | cut -d':' -f6"
+    register: home_dirs
+
+  - name: Removing the break
+    ansible.builtin.shell: "for i in {/home/ec2-user/.bashrc,/root/.bashrc}; do sed -i -e 's|export HTTPS_PROXY=http://satellite.{{ var_subdomain_internal }}:443||g' $i; sed -i -e 's|export HTTP_PROXY=http://satellite.{{ var_subdomain_internal }}:80||g' $i; done; unset HTTPS_PROXY; unset HTTP_PROXY"
+    notify: Source .bashrc
 
   - name: "Unregister the node from the Satellite"
     redhat.rhel_system_roles.redhat_subscription:
       state: absent
     become: true
+  
+  handlers:
+    - name: Source .bashrc
+      ansible.builtin.shell: source ~/.bashrc
+      become: true
 
 #Register Nodes to the Capsule server
 - name: Register all Nodes to Capsule
