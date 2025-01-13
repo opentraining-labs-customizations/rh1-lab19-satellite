@@ -43,16 +43,12 @@
 
 #Install katello-ca-consumer RPM on Node Clients
   - name: Install katello-ca-consumer RPM
-    shell: 'dnf install http://capsule.{{ var_subdomain_internal }}/pub/katello-ca-consumer-latest.noar
-ch.rpm -y'
+    shell: 'dnf install http://capsule.{{ var_subdomain_internal }}/pub/katello-ca-consumer-latest.noarch.rpm -y'
 
 #Register Node Clients to the Capsule server to use RHEL9-CV
   - name: Register Nodes to Capsule
-    shell: 'subscription-manager register --username {{var_workshop_satellite_user_name}} --password {{
-var_workshop_satellite_user_password}} --org "Default_Organization" --environments Development/RHEL9-CV
- --force'
+    shell: 'subscription-manager register --username {{var_workshop_satellite_user_name}} --password {{var_workshop_satellite_user_password}} --org "Default_Organization" --environments Development/RHEL9-CV --force'
 
 #Enable the BaseOS, Appstream, and Satellite-Client repos on Node1
   - name: Enable BaseOS, Appstream, Satellite-Client repos on Nodes
-    shell: 'subscription-manager repos --enable rhel-9-for-x86_64-appstream-rpms --enable rhel-9-for-x8
-6_64-baseos-rpms --enable satellite-client-6-for-rhel-9-x86_64-rpms'
+    shell: 'subscription-manager repos --enable rhel-9-for-x86_64-appstream-rpms --enable rhel-9-for-x86_64-baseos-rpms --enable satellite-client-6-for-rhel-9-x86_64-rpms'
