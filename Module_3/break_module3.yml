@@ -4,19 +4,6 @@
   vars_files:
     - /tmp/vars.yml
   tasks:
-  - name: "Publish Red Hat Content View additional content views"
-    redhat.satellite.content_view_version:
-      username: "{{ var_workshop_satellite_user_name }}"
-      password: "{{ var_workshop_satellite_user_password }}"
-      server_url: "https://{{ var_workshop_satellite_url }}"
-      content_view: "RHEL9-CV"
-      organization: "Default Organization"
-      lifecycle_environments:
-        - Development
-        - Test
-        - Production
-    loop: "{{ range(1,15) | list }}"
-
   - name: "Remove the Directory Server Repo to create Orphans"
     redhat.satellite.repository:
       username: "{{ var_workshop_satellite_user_name }}"
@@ -31,6 +18,11 @@
       download_policy: immediate
 
 #Ensure that the Satellite has a automatic cleanup disabled.
+- name: "Run satellite-installer"
+  hosts: "satellite.{{ var_subdomain_internal }}"
+  become: True
+  vars_files:
+    - /tmp/vars.yml
+  tasks:
   - name: Satellite automatic cleanup tasks are disabled.
-    become: true
-    shell: 'sudo satellite-installer --foreman-plugin-tasks-automatic-cleanup false'
+    ansible.builtin.shell: "satellite-installer --foreman-plugin-tasks-automatic-cleanup false"
