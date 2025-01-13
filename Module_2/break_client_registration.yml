@@ -2,25 +2,39 @@
 - name: "Break Registration on Node 2"                                                                 
   vars_files:                                                                                          
     - /tmp/vars.yml                                                                                    
-  hosts: "node2.{{ var_subdomain_internal }}"                                                          
-  tasks:                                                                                               
-                                                                                                       
-  - name: "Unregister the node from the Satellite"                                                     
-    redhat.rhel_system_roles.redhat_subscription:                                                      
-      state: absent                                                                                    
-    become: true                                                                                       
-                                                                                                       
-  - name: "Break rhsm.conf"                                                                            
-    become: true                                                                                       
-    ansible.builtin.lineinfile:                                                                        
-      path: /etc/rhsm/rhsm.conf                    
-      search_string: "proxy_hostname = "                                                               
-      line: "proxy_hostname = thisproxygoesnowhere.local"
-                                                   
-                                                   
-  - name: "Break rhsm.conf part 2"                 
-    become: true                                   
-    ansible.builtin.lineinfile:
-      path: /etc/rhsm/rhsm.conf        
-      search_string: "manage_repos = 1"
-      line: "manage_repos = 0"
+  hosts: "node2.{{ var_subdomain_internal }}"
+  become: true                                                        
+  tasks: 
+    - name: Getting Information for breaking
+      ansible.builtin.shell: "grep home /etc/passwd | cut -d':' -f6"
+      register: home_dirs
+
+    - name: Adding the break
+      ansible.builtin.lineinfile:
+        path: "{{ item }}/.bashrc"
+        line: "{{ proxy_line }}"
+        create: true
+        state: present
+      loop: "{{ home_dirs.stdout_lines | default([]) }}"
+      vars:
+        proxy_line: |
+          export HTTP_PROXY=http://satellite.{{ var_subdomain_internal }}:80
+          export HTTPS_PROXY=http://satellite.{{ var_subdomain_internal }}:443
+      notify: Source .bashrc
+
+    - name: Breaking the big boss
+      ansible.builtin.lineinfile:
+        path: /root/.bashrc
+        line: "{{ proxy_line }}"
+        create: true
+        state: present
+      vars:
+        proxy_line: |
+          export HTTP_PROXY=http://satellite.{{ var_subdomain_internal }}:80
+          export HTTPS_PROXY=http://satellite.{{ var_subdomain_internal }}:443
+      notify: Source .bashrc
+
+  handlers:
+    - name: Source .bashrc
+      ansible.builtin.shell: source ~/.bashrc
+      become: true
