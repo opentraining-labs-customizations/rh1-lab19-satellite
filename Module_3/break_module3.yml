@@ -8,7 +8,7 @@
     redhat.satellite.content_view_version:
       username: "{{ var_workshop_satellite_user_name }}"
       password: "{{ var_workshop_satellite_user_password }}"
-      server_url: "{{ var_workshop_satellite_url }}"
+      server_url: "https://{{ var_workshop_satellite_url }}"
       content_view: "RHEL9-CV"
       organization: "Default Organization"
       lifecycle_environments:
@@ -21,7 +21,7 @@
     redhat.satellite.repository:
       username: "{{ var_workshop_satellite_user_name }}"
       password: "{{ var_workshop_satellite_user_password }}"
-      server_url: "{{ var_workshop_satellite_url }}"
+      server_url: "https://{{ var_workshop_satellite_url }}"
       name: "Red Hat Directory Server 12 for RHEL 9 x86_64 RPMs 9"
       state: absent
       content_type: "yum"
