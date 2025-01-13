@@ -26,3 +26,6 @@
   tasks:
   - name: Satellite automatic cleanup tasks are disabled.
     ansible.builtin.shell: "satellite-installer --foreman-plugin-tasks-automatic-cleanup false"
+
+  - name: Set orphan content protection time
+    ansible.builtin.shell: "hammer settings set --name orphan_protection_time --value 3"
